@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="shareboardMapper">
+	
+	<resultMap id="ShareBoardResultSet" type="ShareBoard">
+			<id property="sbNo" column="SB_NO"/>
+		<result property="sbTitle" column="SB_TITLE"/>
+		<result property="sbContent" column="SB_CONTENT"/>
+		<result property="sbDate" column="SB_CREATEDATE"/>
+		<result property="sbStatus" column="SB_STATUS"/>
+		<result property="cName" column="C_NAME"/>
+		<result property="cNo" column="C_NO"/>
+		<result property="lName" column="L_NAME"/>
+		<result property="lCode" column="L_CODE"/>
+		<result property="sbView" column="SB_VIEW"/>
+		<result property="sbcgName" column="SB_CG_NAME"/>
+		<result property="sbcgCode" column="SB_CG_CODE"/>
+		<result property="originalFileName" column="ORIGINAL_FILE"/>
+		<result property="renameFileName" column="RENAME_FILENAME"/>
+	</resultMap>
+	
+	<resultMap id="LocalResultSet" type="Local">
+		<id property="lCode" column="L_CODE"/>
+		<result property="lName" column="L_NAME"/>
+	</resultMap>
+	
+	<select id="getListCount" resultType="_int">
+		SELECT COUNT(*)
+		FROM SHAREBOARD
+		JOIN CUSTOMER USING(C_NO)
+		WHERE SB_STATUS='Y'
+	</select>
+	
+	<select id="selectList" resultMap="ShareBoardResultSet">
+		SELECT *
+		FROM SHAREBOARD
+		JOIN CUSTOMER USING(C_NO)
+		JOIN LOCAL USING(L_CODE)
+		JOIN SB_CATEGORY USING(SB_CG_CODE)
+		WHERE SB_STATUS='Y'
+		ORDER BY SB_NO DESC
+	</select>
+	
+	<select id="detailBoard" resultMap="ShareBoardResultSet">
+		SELECT * 
+		FROM SHAREBOARD
+		JOIN Sb_Category SB USING(SB_CG_CODE)
+		JOIN CUSTOMER USING(C_NO)
+		JOIN LOCAL USING(L_CODE)
+		WHERE SB_NO=#{sbNo}
+		AND SB_STATUS='Y'
+	</select>
+	
+	<update id="updateShareBoard" parameterType="ShareBoard">
+	UPDATE SHAREBOARD
+	SET SB_TITLE=#{sbTitle}, SB_CONTENT=#{sbContent}, SB_CREATEDATE=SYSDATE, ORIGINAL_FILE=#{originalFileName},RENAME_FILENAME=#{renameFileName},
+	SB_CG_CODE=(SELECT SB_CG_CODE
+				 FROM SB_CATEGORY
+				 WHERE SB_CG_NAME=#{sbcgName})
+
+	WHERE SB_NO=#{sbNo}
+	AND SB_STATUS='Y'
+	</update>
+	
+	<update id="updateCount" parameterType="_int">
+		UPDATE SHAREBOARD
+		SET SB_VIEW = SB_VIEW + 1
+		WHERE SB_NO = #{sbNo}
+	</update>
+	
+	<update id="deleteShareBoard" parameterType="ShareBoard">
+		UPDATE SHAREBOARD
+		SET SB_STATUS = 'N'
+		WHERE SB_NO=#{sbNo}
+	</update>
+	
+	<select id="selectSearchResultCount" resultType="_int">
+			SELECT COUNT(*)
+		FROM SHAREBOARD
+		JOIN CUSTOMER USING(C_NO)
+		WHERE SB_STATUS = 'Y'
+		<if test="writer != null">
+		 AND C_NAME LIKE '%' || #{writer} || '%' </if>
+		<if test="title != null"> 
+		AND SB_TITLE LIKE '%' || #{title} || '%' </if>
+		<if test="content != null"> 
+		AND SB_CONTENT LIKE '%' || #{content} || '%' </if>
+		
+		AND ( SB_TITLE LIKE '%' || #{all} || '%' OR SB_CONTENT LIKE '%'|| #{all} || '%' OR C_NAME LIKE '%' || #{all} || '%')
+		
+	</select>
+	
+	<select id="selectSearchResultList" resultMap="ShareBoardResultSet">
+		SELECT *
+		FROM SHAREBOARD
+		JOIN CUSTOMER USING(C_NO)
+		WHERE SB_STATUS = 'Y'
+		<choose>
+		<when test="writer != null"> 
+		AND C_NAME LIKE '%' || #{writer} || '%' </when>
+		<when test="title != null">
+		 AND SB_TITLE LIKE '%' || #{title} || '%' </when>
+		<when test="content != null">
+		 AND SB_CONTENT LIKE '%' || #{content} || '%' </when>
+		<otherwise> AND  SB_TITLE LIKE '%' || #{all} || '%' OR SB_CONTENT LIKE '%'|| #{all} || '%' OR C_NAME LIKE '%' || #{all} || '%'</otherwise>
+		</choose>
+	</select>
+	
+<select id="selectCGSearchResultListCount" resultType="_int">
+		SELECT COUNT(*)
+		FROM SHAREBOARD
+		JOIN SB_CATEGORY USING(SB_CG_CODE)
+		WHERE SB_STATUS='Y'
+		<if test="sell != null"> 
+		AND SB_CG_NAME=#{sell} </if>
+		<if test="buy != null"> 
+		AND SB_CG_NAME=#{buy} </if>
+		<if test="share != null"> 
+		AND SB_CG_NAME=#{share} </if>
+		<if test="information != null"> 
+		AND SB_CG_NAME=#{information} </if>
+		<if test="etc != null"> 
+		AND SB_CG_NAME=#{etc} </if>
+		ORDER BY SB_NO DESC
+		 
+	</select>
+	
+	<select id="selectCGSearchResultList" resultMap="ShareBoardResultSet">
+		SELECT *
+		FROM SHAREBOARD
+		JOIN SB_CATEGORY USING(SB_CG_CODE)
+		WHERE SB_STATUS='Y'
+		<choose>
+		<when test="sell != null"> 
+		AND SB_CG_NAME=#{sell} </when>
+		<when test="buy != null"> 
+		AND SB_CG_NAME=#{buy} </when>
+		<when test="share != null"> 
+		AND SB_CG_NAME=#{share} </when>
+		<when test="information != null"> 
+		AND SB_CG_NAME=#{information} </when>
+			<otherwise> AND SB_CG_NAME=#{etc}</otherwise>
+		</choose>
+		ORDER BY SB_NO DESC
+	</select>
+	
+	<insert id="insertBoard" parameterType="ShareBoard">
+		INSERT INTO SHAREBOARD 
+		VALUES(SB_NO.NEXTVAL, #{sbTitle}, #{sbContent}, SYSDATE, 'Y', #{cNo},
+		(SELECT L_CODE
+		FROM LOCAL
+		WHERE L_NAME = #{lName}), #{sbView}, (SELECT SB_CG_CODE
+         FROM SB_CATEGORY
+        WHERE SB_CG_NAME=#{sbcgName}), #{originalFileName}, #{renameFileName})
+	</insert>
+	
+	<select id="localSelectList" resultMap="LocalResultSet">
+		SELECT *
+		FROM LOCAL
+		LEFT JOIN SHAREBOARD USING(L_CODE)
+		WHERE L_NAME LIKE '%'|| #{lName} || '%'
+		
+	</select>
+	
+	
+	<select id="selectListAddress" resultMap="LocalResultSet">
+	  	SELECT *
+		FROM SHAREBOARD
+		RIGHT JOIN CUSTOMER USING(C_NO)
+		LEFT JOIN LOCAL USING(L_CODE)
+		LEFT JOIN SB_CATEGORY USING(SB_CG_CODE)
+		WHERE C_ADDRESS LIKE '%'|| #{lName} || '%'
+		ORDER BY SB_NO DESC
+		<!-- ORDER BY SB_NO DESC -->
+	</select>
+	
+	<select id="searchList" resultMap="ShareBoardResultSet" parameterType="string">
+		SELECT *
+		FROM SHAREBOARD
+		JOIN CUSTOMER USING(C_NO) JOIN LOCAL USING(L_CODE)
+		WHERE SB_STATUS='Y' AND SB_TITLE LIKE '%' || #{searchStr} || '%'
+		ORDER BY SB_NO DESC 
+		</select>
+	
+		<select id="selectOne" parameterType="_int" resultMap="ShareBoardResultSet">
+		SELECT * 
+		FROM SHAREBOARD
+		JOIN Sb_Category SB USING(SB_CG_CODE)
+		JOIN CUSTOMER USING(C_NO)
+		JOIN LOCAL USING(L_CODE)
+		WHERE SB_NO=#{sbNo}
+		AND SB_STATUS='Y'
+	</select>
+
+
+</mapper>
+	

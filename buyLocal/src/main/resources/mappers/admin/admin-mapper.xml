@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+"-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AdminMapper">
+
+
+
+	<resultMap id="NoticeResultSet" type="Notice">
+		<id property="nNo" column="N_NO" />
+		<result property="nTitle" column="N_TITLE" />
+		<result property="nContent" column="N_CONTENT" />
+		<result property="nDate" column="N_DATE" />
+		<result property="nStatus" column="N_STATUS" />
+		<result property="nView" column="N_VIEW" />
+	</resultMap>
+
+	<!-- 범석 -->
+	<resultMap id="DealSet" type="Deal">
+		<id property="dNo" column="D_NO" />
+		<result property="dDate" column="D_DATE" />
+		<result property="pNo" column="P_NO" />
+		<result property="pName" column="P_NAME" />
+		<result property="cNo" column="C_NO" />
+		<result property="cName" column="C_NAME" />
+		<result property="dPrice" column="D_PRICE" />
+		<result property="dAmount" column="D_AMOUNT" />
+		<result property="dMethod" column="D_METHOD" />
+		<result property="dReceiver" column="D_RECEIVER" />
+		<result property="dRevCheck" column="D_REVCHECK" />
+		<result property="dStatus" column="D_STATUS" />
+		<result property="dUid" column="D_UID" />
+		<result property="bShopName" column="hello" />
+	</resultMap>
+	<!-- 범석 -->
+
+
+	<select id="getListCount" resultType="_int">
+		SELECT COUNT(*)
+		FROM NOTICE
+		WHERE N_STATUS = 'Y'
+	</select>
+
+	<update id="updateCount" parameterType="_int">
+		UPDATE NOTICE
+		SET N_VIEW =
+		N_VIEW+1
+		WHERE N_NO = #{nNo}
+	</update>
+
+	<update id="NoticeDelete" parameterType="_int">
+		UPDATE NOTICE
+		SET
+		N_STATUS = 'N'
+		WHERE N_NO = #{nNo}
+
+	</update>
+	<update id="NoticeUpdate" parameterType="Notice">
+		UPDATE NOTICE
+		SET
+		N_TITLE
+		= #{nTitle},
+		N_CONTENT = #{nContent},
+		N_DATE = SYSDATE
+		WHERE N_NO =
+		#{nNo}
+
+	</update>
+
+
+	<select id="NoticeSelectList" resultMap="NoticeResultSet">
+		SELECT *
+		FROM NOTICE
+		WHERE
+		N_STATUS='Y'
+		ORDER BY N_NO DESC
+	</select>
+
+	<insert id="NoticeInsert" parameterType="Notice">
+		INSERT INTO NOTICE
+		VALUES(
+		SEQ_NOTICE.nextval, #{nTitle}, #{nContent}, SYSDATE, DEFAULT, 0
+		)
+	</insert>
+
+
+	<select id="NoticeSelectOne" resultMap="NoticeResultSet">
+		SELECT *
+		FROM NOTICE
+		WHERE N_NO = #{nNo}
+	</select>
+
+
+
+
+	<!-- 범석 -->
+	<select id="selectDeal" resultMap="DealSet">
+		SELECT D.D_NO, D.D_DATE,
+		D.P_NO, D.C_NO, D.D_PRICE, D_AMOUNT, D_METHOD, D_RECEIVER, D_REV_DATE,
+		D_REV_CHECK, D_STATUS, D_UID,
+		PRODUCT.P_NAME, CUSTOMER.C_NAME, B_SHOP_NAME hello
+		FROM DEAL D
+		JOIN PRODUCT ON(D.P_NO =
+		PRODUCT.P_NO)
+		JOIN CUSTOMER ON(CUSTOMER.C_NO = D.C_NO)
+		JOIN BUSINESS_INFO ON(PRODUCT.C_NO = BUSINESS_INFO.C_NO)
+	</select>
+
+	<select id="selectDeal2" resultType="_int"
+		parameterType="string">
+		SELECT COUNT(*)
+		FROM DEAL D
+		JOIN PRODUCT ON(D.P_NO = PRODUCT.P_NO)
+		JOIN
+		CUSTOMER ON(CUSTOMER.C_NO = D.C_NO)
+		<choose>
+			<when test="str == 'C1'">
+				WHERE PRODUCT.CG_CODE = 'C1'
+			</when>
+			<when test="str == 'C2'">
+				WHERE PRODUCT.CG_CODE = 'C2'
+			</when>
+			<when test="str == 'C3'">
+				WHERE PRODUCT.CG_CODE = 'C3'
+			</when>
+			<when test="str == 'C4'">
+				WHERE PRODUCT.CG_CODE = 'C4'
+			</when>
+			<when test="str == 'C5'">
+				WHERE PRODUCT.CG_CODE = 'C5'
+			</when>
+			<when test="str == 'C6'">
+				WHERE PRODUCT.CG_CODE = 'C6'
+			</when>
+			<when test="str == 'C7'">
+				WHERE PRODUCT.CG_CODE = 'C7'
+			</when>
+			<when test="str == 'C8'">
+				WHERE PRODUCT.CG_CODE = 'C8'
+			</when>
+			<when test="str == 'C9'">
+				WHERE PRODUCT.CG_CODE = 'C9'
+			</when>
+			<when test="str == 'C10'">
+				WHERE PRODUCT.CG_CODE = 'C10'
+			</when>
+		</choose>
+
+	</select>
+	<!-- 범석 -->
+
+	<select id="selectDealSeller" parameterType="_int"
+		resultMap="DealSet">
+		SELECT D.D_NO, D.D_DATE, D.P_NO, D.C_NO, D.D_PRICE, D_AMOUNT, D_METHOD,
+		D_RECEIVER, D_REV_DATE, D_REV_CHECK, D_STATUS, D_UID, PRODUCT.P_NAME,
+		C1.C_NAME, B_SHOP_NAME hello
+		FROM DEAL D
+		JOIN PRODUCT ON(D.P_NO =
+		PRODUCT.P_NO)
+		JOIN CUSTOMER C1 ON(C1.C_NO = D.C_NO)
+		JOIN CUSTOMER C2
+		ON(C2.C_NO = PRODUCT.C_NO)
+		JOIN BUSINESS_INFO ON (PRODUCT.C_NO = BUSINESS_INFO.C_NO)
+		WHERE
+		PRODUCT.C_NO = #{cNo}
+	</select>
+
+
+	<select id="selectDeal3" resultType="_int"
+		parameterType="string">
+		SELECT COUNT(*)
+		FROM DEAL D
+		JOIN PRODUCT ON(D.P_NO = PRODUCT.P_NO)
+		JOIN
+		CUSTOMER C1 ON(C1.C_NO = D.C_NO)
+		JOIN CUSTOMER C2 ON(C2.C_NO =
+		PRODUCT.C_NO)
+		WHERE PRODUCT.C_NO = #{cNo}
+		<choose>
+			<when test="str == 'C1'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 01
+			</when>
+			<when test="str == 'C2'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 02
+			</when>
+			<when test="str == 'C3'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 03
+			</when>
+			<when test="str == 'C4'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 04
+			</when>
+			<when test="str == 'C5'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 05
+			</when>
+			<when test="str == 'C6'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 06
+			</when>
+			<when test="str == 'C7'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 07
+			</when>
+			<when test="str == 'C8'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 08
+			</when>
+			<when test="str == 'C9'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 09
+			</when>
+			<when test="str == 'C10'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 10
+			</when>
+			<when test="str == 'C11'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 11
+			</when>
+			<when test="str == 'C12'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 12
+			</when>
+
+		</choose>
+
+	</select>
+
+	<!-- 총 거래량 -->
+	<select id="selectDeal4" resultType="_int"
+		parameterType="string">
+
+		SELECT COUNT(*)
+		FROM DEAL D
+		JOIN PRODUCT ON(D.P_NO = PRODUCT.P_NO)
+		JOIN
+		CUSTOMER C1 ON(C1.C_NO = D.C_NO)
+		JOIN CUSTOMER C2 ON(C2.C_NO =
+		PRODUCT.C_NO)
+
+		<choose>
+			<when test="str == 'C1'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 01
+			</when>
+			<when test="str == 'C2'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 02
+			</when>
+			<when test="str == 'C3'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 03
+			</when>
+			<when test="str == 'C4'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 04
+			</when>
+			<when test="str == 'C5'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 05
+			</when>
+			<when test="str == 'C6'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 06
+			</when>
+			<when test="str == 'C7'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 07
+			</when>
+			<when test="str == 'C8'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 08
+			</when>
+			<when test="str == 'C9'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 09
+			</when>
+			<when test="str == 'C10'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 10
+			</when>
+			<when test="str == 'C11'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 11
+			</when>
+			<when test="str == 'C12'">
+				AND to_char( D_DATE, 'yy' ) = to_char(sysdate, 'yy')
+				AND to_char(D_DATE, 'MM') = 12
+			</when>
+
+		</choose>
+
+
+
+
+	</select>
+
+
+	<select id="selectDealAll" resultType="_int"
+		parameterType="string">
+
+		SELECT COUNT(*)
+		FROM DEAL D
+		JOIN PRODUCT ON(D.P_NO = PRODUCT.P_NO)
+		JOIN
+		CUSTOMER ON(CUSTOMER.C_NO = D.C_NO)
+		<choose>
+			<when test="str == 'C1'">
+				WHERE PRODUCT.CG_CODE = 'C1'
+			</when>
+			<when test="str == 'C2'">
+				WHERE PRODUCT.CG_CODE = 'C2'
+			</when>
+			<when test="str == 'C3'">
+				WHERE PRODUCT.CG_CODE = 'C3'
+			</when>
+			<when test="str == 'C4'">
+				WHERE PRODUCT.CG_CODE = 'C4'
+			</when>
+			<when test="str == 'C5'">
+				WHERE PRODUCT.CG_CODE = 'C5'
+			</when>
+			<when test="str == 'C6'">
+				WHERE PRODUCT.CG_CODE = 'C6'
+			</when>
+			<when test="str == 'C7'">
+				WHERE PRODUCT.CG_CODE = 'C7'
+			</when>
+			<when test="str == 'C8'">
+				WHERE PRODUCT.CG_CODE = 'C8'
+			</when>
+			<when test="str == 'C9'">
+				WHERE PRODUCT.CG_CODE = 'C9'
+			</when>
+			<when test="str == 'C10'">
+				WHERE PRODUCT.CG_CODE = 'C10'
+			</when>
+
+			<when test="str == 'T1'">
+				WHERE PRODUCT.CG_CODE = 'T1'
+			</when>
+
+			<when test="str == 'T2'">
+				WHERE PRODUCT.CG_CODE = 'T2'
+			</when>
+
+			<when test="str == 'T3'">
+				WHERE PRODUCT.CG_CODE = 'T3'
+			</when>
+
+			<when test="str == 'T4'">
+				WHERE PRODUCT.CG_CODE = 'T4'
+			</when>
+
+			<when test="str == 'T5'">
+				WHERE PRODUCT.CG_CODE = 'T5'
+			</when>
+
+			<when test="str == 'T6'">
+				WHERE PRODUCT.CG_CODE = 'T6'
+			</when>
+		</choose>
+
+	</select>
+
+
+
+	<select id="selectDealCategory" resultType="_int"
+		parameterType="string">
+
+		SELECT COUNT(*)
+		FROM DEAL D
+		JOIN PRODUCT ON(D.P_NO = PRODUCT.P_NO)
+		JOIN
+		CUSTOMER ON(CUSTOMER.C_NO = D.C_NO)
+		WHERE PRODUCT.C_NO = #{cNo}
+		<choose>
+			<when test="str == 'C1'">
+				AND PRODUCT.CG_CODE = 'C1'
+			</when>
+			<when test="str == 'C2'">
+				AND PRODUCT.CG_CODE = 'C2'
+			</when>
+			<when test="str == 'C3'">
+				AND PRODUCT.CG_CODE = 'C3'
+			</when>
+			<when test="str == 'C4'">
+				AND PRODUCT.CG_CODE = 'C4'
+			</when>
+			<when test="str == 'C5'">
+				AND PRODUCT.CG_CODE = 'C5'
+			</when>
+			<when test="str == 'C6'">
+				AND PRODUCT.CG_CODE = 'C6'
+			</when>
+			<when test="str == 'C7'">
+				AND PRODUCT.CG_CODE = 'C7'
+			</when>
+			<when test="str == 'C8'">
+				AND PRODUCT.CG_CODE = 'C8'
+			</when>
+			<when test="str == 'C9'">
+				AND PRODUCT.CG_CODE = 'C9'
+			</when>
+			<when test="str == 'C10'">
+				AND PRODUCT.CG_CODE = 'C10'
+			</when>
+
+			<when test="str == 'T1'">
+				AND PRODUCT.CG_CODE = 'T1'
+			</when>
+
+			<when test="str == 'T2'">
+				AND PRODUCT.CG_CODE = 'T2'
+			</when>
+
+			<when test="str == 'T3'">
+				AND PRODUCT.CG_CODE = 'T3'
+			</when>
+
+			<when test="str == 'T4'">
+				AND PRODUCT.CG_CODE = 'T4'
+			</when>
+
+			<when test="str == 'T5'">
+				AND PRODUCT.CG_CODE = 'T5'
+			</when>
+
+			<when test="str == 'T6'">
+				AND PRODUCT.CG_CODE = 'T6'
+			</when>
+		</choose>
+
+	</select>
+
+
+
+</mapper>

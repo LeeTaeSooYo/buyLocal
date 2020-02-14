@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+"-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.rog/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="noticeMapper">
+	<resultMap id="noticeSet" type="notice">
+		<id property="nNo" column="N_NO"/>
+		<result property="nTitle" column="N_TITLE"/>
+		<result property="nContent" column="N_CONTENT"/>
+		<result property="nDate" column="N_DATE"/>
+		<result property="nStatus" column="N_STATUS"/>
+		<result property="nView" column="N_VIEW"/>
+	</resultMap>
+	
+	<select id="getListCount" resultType="_int">
+		SELECT COUNT(*)
+		FROM NOTICE
+		WHERE N_STATUS='Y'
+	</select>
+	
+	<select id="selectList" resultMap="noticeSet">
+		SELECT *
+		FROM NOTICE
+		WHERE N_STATUS='Y' 
+		ORDER BY N_DATE
+	</select>
+	
+</mapper>

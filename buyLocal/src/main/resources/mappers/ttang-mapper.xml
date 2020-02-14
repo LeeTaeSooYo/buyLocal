@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+"-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.rog/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ttangMapper">
+
+	<!-- <resultMap id="productSet" type="productT">
+		<id property="pNo" column="P_NO"/>
+		<result property="pName" column="P_NAME"/>
+		<result property="pThumb" column="P_THUMB"/>
+		<result property="pOriginalPrice" column="P_ORIGINALPRICE"/>
+		<result property="pFinalPrice" column="P_FINALPRICE"/>
+		<result property="pAmount" column="P_AMOUNT"/>
+		<result property="pInfoImage" column="P_INFO_IMAGE"/>
+		<result property="pInfoText" column="P_INFO_TEXT"/>
+		<result property="cgName" column="CG_NAME"/>
+		<result property="pDate" column="P_DATE"/>
+		<result property="pStatus" column="P_STATUS"/>
+		<result property="lName" column="L_NAME"/>
+		<result property="bOwner" column="B_OWNER"/>
+		<result property="bShopAddress" column="B_SHOP_ADDRESS"/>
+		<result property="cPhone" column="C_PHONE"/>
+		<result property="pStarRate" column="P_STARRATE"/>
+		<result property="pOrigin" column="P_ORIGIN"/>
+		<result property="pTitle" column="P_TITLE"/>
+		<result property="pBoard" column="P_BOARD"/>
+	</resultMap> -->
+	
+	<!-- 상품의 추가정보 가져오기 -->
+	<resultMap id="productSet" type="productT">
+		<id property="pNo" column="P_NO"/>
+		<result property="pName" column="P_NAME"/>
+		<result property="pThumb" column="P_THUMB"/>
+		<result property="pOriginalPrice" column="P_ORIGINALPRICE"/>
+		<result property="pFinalPrice" column="P_FINALPRICE"/>
+		<result property="pAmount" column="P_AMOUNT"/>
+		<result property="pInfoImage" column="P_INFO_IMAGE"/>
+		<result property="pInfoText" column="P_INFO_TEXT"/>
+		<result property="cgName" column="CG_NAME"/>
+		<result property="pDate" column="P_DATE"/>
+		<result property="pStatus" column="P_STATUS"/>
+		<result property="lName" column="L_NAME"/>
+		<result property="bOwner" column="B_OWNER"/>
+		<result property="bShopNo" column="B_SHOP_NO"/>
+		<result property="bShopName" column="B_SHOP_NAME"/>
+		<result property="bShopAddress" column="B_SHOP_ADDRESS"/>
+		<result property="cEmail" column="C_EMAIL"/>
+		<result property="cPhone" column="C_PHONE"/>
+		<result property="pVolume" column="P_VOLUME"/>
+		<result property="pProductDate" column="P_PRODUCT_DATE"/>
+		<result property="pTreatment" column="P_TREATMENT"/>
+		<result property="pStarRate" column="P_STARRATE"/>
+		<result property="pOrigin" column="P_ORIGIN"/>
+		<result property="pTitle" column="P_TITLE"/>
+		<result property="pBoard" column="P_BOARD"/>
+	</resultMap> 
+	
+	<!-- 추가 -->
+	<resultMap id="cartSet" type="Cart">
+		<id property="cNo" column="C_NO"/>
+		<id property="pNo" column="P_NO"/>
+		<result property="pName" column="P_NAME"/>
+		<result property="quantity" column="QUANTITY"/>
+		<result property="pFinalPrice" column="P_FINALPRICE"/>
+		<result property="pInfoText" column="P_INFO_TEXT"/>
+	</resultMap>
+	
+	<resultMap id="FavoriteSet" type="Favorite">
+		<id property="pNo" column="P_NO"/>
+		<id property="cNo" column="C_NO"/>
+		<result property="pName" column="P_NAME"/>
+		<result property="pFinalPrice" column="P_FINALPRICE"/>
+		<result property="cgName" column="CG_NAME"/>
+	</resultMap>
+	
+	<resultMap id="DealSet" type="Deal">
+		<id property="dNo" column="D_NO"/>
+		<result property="dDate" column="D_DATE"/>
+		<result property="pNo" column="P_NO"/>
+		<result property="pName" column="P_NAME"/>
+		<result property="cNo" column="C_NO"/>
+		<result property="cName" column="C_NAME"/>
+		<result property="dPrice" column="D_PRICE"/>
+		<result property="dAmount" column="D_AMOUNT"/>
+		<result property="dMethod" column="D_METHOD"/>
+		<result property="dReceiver" column="D_RECEIVER"/>
+		<result property="dRevCheck" column="D_REVCHECK"/>
+		<result property="dStatus" column="D_STATUS"/>
+		<result property="dUid" column="D_UID"/>
+	</resultMap> 
+	
+	
+	<!-- 로그인 x 일 경우 상품 갯수 조회 -->
+	<select id="getListCount" resultType="_int">
+		SELECT COUNT(*)
+		FROM PD_VIEW
+		WHERE P_STATUS='Y' AND P_BOARD='땡처리'
+	</select>
+	
+	<!-- 로그인 o 일 경우 상품 갯수 조회 -->
+	<select id="getListCount2" resultType="_int" parameterType="string">
+		SELECT COUNT(*)
+		FROM PD_VIEW
+		WHERE P_STATUS='Y' AND P_BOARD='땡처리' AND B_SHOP_ADDRESS LIKE '%'|| #{location} || '%'
+	</select>
+	
+	<select id="getListCountC" resultType="_int" parameterType="string">
+		SELECT COUNT(*)
+		FROM PD_VIEW
+		WHERE P_STATUS='Y' AND P_BOARD='땡처리' AND CG_NAME = #{location}
+	</select>
+	
+	
+	<!-- 로그인 x 일 경우 상품 리스트 조회 -->
+	<select id="selectList" resultMap="productSet">
+		SELECT * 
+		FROM PD_VIEW
+		WHERE P_STATUS='Y' AND P_BOARD='땡처리'
+		ORDER BY P_NO DESC
+	</select>
+	
+	<!-- 로그인 o 일 경우 상품 리스트 조회 -->
+	<select id="selectList2" resultMap="productSet">
+		SELECT * 
+		FROM PD_VIEW
+		WHERE P_STATUS='Y' AND P_BOARD='땡처리' AND B_SHOP_ADDRESS LIKE '%'|| #{location} || '%'
+		ORDER BY P_NO DESC
+	</select>
+	
+	<select id="selectList3" resultMap="productSet" parameterType="hashmap">
+		SELECT * 
+		FROM PD_VIEW
+		WHERE P_STATUS='Y' AND P_BOARD='땡처리' AND B_SHOP_ADDRESS LIKE '%'|| #{location} || '%'
+		<if test="optionArray == '이름순(A-Z)'">
+			ORDER BY P_NAME
+		</if>
+		<if test="optionArray == '이름순(Z-A)'">
+			ORDER BY P_NAME DESC
+		</if>
+		<if test="optionArray == '가격순(low to high)'">
+			ORDER BY P_ORIGINALPRICE
+		</if>
+		<if test="optionArray == '가격순(high to low)'">
+			ORDER BY P_ORIGINALPRICE DESC
+		</if>
+	</select>
+	
+	<select id="selectList4" resultMap="productSet" parameterType="string">
+		SELECT * 
+		FROM PD_VIEW
+		WHERE P_STATUS='Y' AND P_BOARD='땡처리' 
+		<if test="optionArray == '이름순(A-Z)'">
+			ORDER BY P_NAME
+		</if>
+		<if test="optionArray == '이름순(Z-A)'">
+			ORDER BY P_NAME DESC
+		</if>
+		<if test="optionArray == '가격순(low to high)'">
+			ORDER BY P_ORIGINALPRICE
+		</if>
+		<if test="optionArray == '가격순(high to low)'">
+			ORDER BY P_ORIGINALPRICE DESC
+		</if>
+	</select>
+	
+	<select id="selectListC" resultMap="productSet" parameterType="hashmap">
+		SELECT * 
+		FROM PD_VIEW
+		WHERE P_STATUS='Y' AND P_BOARD='땡처리' AND B_SHOP_ADDRESS LIKE '%'|| #{location} || '%'
+		AND CG_NAME = #{category}
+	</select>
+	
+	<select id="selectListC2" resultMap="productSet" parameterType="hashmap">
+		SELECT * 
+		FROM PD_VIEW
+		WHERE P_STATUS='Y' AND P_BOARD='땡처리' AND CG_NAME = #{category}
+	</select>
+	
+	<!-- <select id="selectBoard" resultMap="productSet">
+		SELECT * 
+		FROM PD_VIEW
+		WHERE P_STATUS='Y' AND P_BOARD='땡처리'
+		AND P_NO = #{pNo}
+	</select> -->
+	
+	<!-- <update id="updateBoard" parameterType="product">
+		UPDATE PRODUCT
+		SET P_STARRATE = #{pStarRate}
+		WHERE P_NO = #{pNo}
+	</update>
+	 -->
+	
+	<select id="getMyCart" resultMap ="cartSet">
+		SELECT CART.C_NO, CART.P_NO, P_NAME, QUANTITY, P_FINALPRICE, P_INFO_TEXT
+		FROM PRODUCT JOIN CART ON (CART.P_NO = PRODUCT.P_NO) 
+		WHERE CART.C_NO = #{cNo}
+		
+	</select>
+	
+	<insert id="addCart" parameterType="Cart">
+		INSERT INTO CART
+		VALUES(SEQ_CART.NEXTVAL, #{cNo}, #{pNo}, #{quantity})
+	</insert>
+	
+	<delete id="buyProduct" parameterType="_int">
+		DELETE FROM CART 
+		WHERE C_NO = #{cNo}
+	</delete>
+	
+	<insert id="addWishList" parameterType="Favorite">
+		INSERT INTO FAVORITE
+		VALUES(#{pNo}, #{cNo})
+	</insert>
+	
+	<select id="getMyWishList" resultMap="FavoriteSet">
+		SELECT PRODUCT.P_NO, CUSTOMER.C_NO, P_NAME, P_FINALPRICE, CG_NAME
+		FROM PRODUCT JOIN FAVORITE ON(PRODUCT.P_NO = FAVORITE.P_NO)
+        JOIN CATEGORY USING(CG_CODE)
+        JOIN CUSTOMER ON(FAVORITE.C_NO = CUSTOMER.C_NO)
+        WHERE FAVORITE.C_NO = #{cNo}
+	</select>
+	
+	<delete id="deleteWishList" parameterType="Favorite">
+		DELETE FROM FAVORITE
+		WHERE P_NO=#{pNo} AND C_NO=#{cNo}
+	</delete>
+	
+	<delete id="deleteCart" parameterType="Cart">
+		DELETE FROM CART
+		WHERE P_NO=#{pNo} AND C_NO=#{cNo}
+	</delete>
+	
+	
+	<insert id="insertDeal" parameterType="Deal">
+		INSERT INTO DEAL
+		VALUES(SEQ_DEAL.NEXTVAL, SYSDATE, #{pNo}, #{cNo}, #{dPrice}, #{dAmount}, #{dMethod}, #{dReceiver}, NULL, #{dRevCheck}, #{dStatus}, #{dUid})
+	</insert>
+	
+	<select id="selectDeal" parameterType="_int" resultMap="DealSet">
+		SELECT D.D_NO, D.D_DATE, D.P_NO, D.C_NO, D.D_PRICE, D_AMOUNT, D_METHOD, D_RECEIVER, D_REV_DATE, D_REV_CHECK, D_STATUS, D_UID, PRODUCT.P_NAME, CUSTOMER.C_NAME
+		FROM DEAL D
+		JOIN PRODUCT ON(D.P_NO = PRODUCT.P_NO)
+		JOIN CUSTOMER ON(CUSTOMER.C_NO = PRODUCT.C_NO)
+		WHERE D_NO = #{dNo}
+	</select>
+	
+	
+	<select id="searchList" resultMap="productSet" parameterType="string">
+	 SELECT *
+	 FROM PD_VIEW
+	 WHERE P_STATUS='Y' AND P_BOARD='땡처리' AND P_NAME LIKE '%'|| #{searchStr} || '%'OR P_TITLE LIKE '%' || #{searchStr} || '%' 
+	 </select>
+	
+	
+	<!-- =========== -->
+	
+	<select id="selectBoard" resultMap="productSet">
+		SELECT *
+		FROM PD_VIEW2
+		WHERE P_NO = #{pNo} AND B_SHOP_NO IS NOT NULL
+		AND P_STATUS = 'Y' AND P_BOARD = '땡처리'
+	</select>
+
+	
+	
+</mapper>

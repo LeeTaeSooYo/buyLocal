@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+"-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="adUserMapper">
+
+
+
+	<resultMap id="CustomerResultSet" type="CustomerAdmin">
+		<id property="cNo" column="C_NO" />
+		<result property="cName" column="C_NAME" />
+		<result property="cId" column="C_ID" />
+		<result property="cPwd" column="C_PWD" />
+		<result property="cEmail" column="C_EMAIL" />
+		<result property="cAddress" column="C_ADDRESS" />
+		<result property="cStatus" column="C_STATUS" />
+		<result property="cPhone" column="C_PHONE" />
+		<result property="cEnrollDate" column="C_ENROLLDATE" />
+		<result property="cLevel" column="C_LEVEL" />
+
+		<result property="bShopNo" column="B_SHOP_NO" />
+		<result property="bPermit" column="B_PERMIT" />
+		<result property="bShopName" column="B_SHOP_NAME" />
+		<result property="bClass" column="B_CLASS" />
+		<result property="bDetailClass" column="B_DETAIL_CLASS" />
+		<result property="bOwner" column="B_OWNER" />
+		<result property="bPic" column="B_PIC" />
+		<result property="bShopAddress" column="B_SHOP_ADDRESS" />
+
+
+		<result property="dDate" column="D_DATE" />
+		<result property="dPrice" column="D_PRICE" />
+		<result property="dRevCheck" column="D_REV_CHECK" />
+
+
+	</resultMap>
+
+
+	<resultMap id="DealResultSet" type="adDeal">
+		<id property="dNo" column="D_NO" />
+		<result property="dDate" column="D_DATE" />
+		<result property="pNo" column="P_NO" />
+		<result property="pName" column="P_NAME" />
+		<result property="cNo" column="C_NO" />
+		<result property="cName" column="C_NAME" />
+		<result property="dPrice" column="hap" />
+		<result property="dAmount" column="D_AMOUNT" />
+		<result property="dMethod" column="D_METHOD" />
+		<result property="dReceiver" column="D_RECEIVER" />
+		<result property="dRevCheck" column="D_REV_CHECK" />
+		<result property="dStatus" column="D_STATUS" />
+		<result property="dUid" column="D_UID" />
+		<result property="bShopName" column="B_SHOP_NAME" />
+		<result property="bOwner" column="B_OWNER" />
+
+	</resultMap>
+
+
+
+	<!-- 비즈니스 등급 회원 정보만 출력 -->
+	<select id="BusinessUserGradeSelectList"
+		resultMap="CustomerResultSet">
+		SELECT C_NO, C_NAME, C_ID, C_STATUS, C_ENROLLDATE,
+		C_ADDRESS, C_LEVEL, 
+		B_SHOP_NAME, B_CLASS, B_PERMIT, B_OWNER,
+		B_SHOP_ADDRESS
+		FROM CUSTOMER
+		JOIN BUSINESS_INFO USING(C_NO)
+        WHERE B_PERMIT = 'N'
+        AND C_LEVEL = '일반'
+	</select>
+
+
+	<!-- 비즈니스 회원만 출력 -->
+	<select id="BusinessUserInfoSelectList"
+		resultMap="CustomerResultSet">
+		SELECT C_NO, C_NAME, C_ID, C_STATUS, C_ENROLLDATE,
+		C_ADDRESS, C_LEVEL,
+		B_SHOP_NAME, B_CLASS, B_PERMIT, B_OWNER,
+		B_SHOP_ADDRESS
+		FROM CUSTOMER
+		JOIN BUSINESS_INFO USING(C_NO)
+		WHERE B_PERMIT = 'Y'
+		AND C_STATUS = 'Y'
+	</select>
+
+
+	<!-- 신고된 비즈니스 회원만 출력 -->
+	<select id="BusinessUserInfoSelectList2"
+		resultMap="CustomerResultSet">
+		SELECT C_NO, C_NAME, C_ID, C_STATUS, C_ENROLLDATE,
+		C_ADDRESS, C_LEVEL,
+		B_SHOP_NAME, B_CLASS, B_PERMIT, B_OWNER,
+		B_SHOP_ADDRESS
+		FROM CUSTOMER
+		JOIN BUSINESS_INFO USING(C_NO)
+		WHERE B_PERMIT = 'N'
+		AND C_STATUS = 'N'
+		<!--  AND C_LEVEL = '일반' -->
+	</select>
+
+	<!-- 사업자 회원 값 출력 -->
+	<select id="selectCustomer" resultMap="CustomerResultSet">
+		SELECT C_NO, C_NAME, C_ID,
+		C_STATUS, C_EMAIL, C_ENROLLDATE, C_ADDRESS, B_SHOP_NAME,C_LEVEL,
+		B_CLASS, B_PERMIT,
+		B_OWNER, B_SHOP_ADDRESS, B_SHOP_NO
+		FROM CUSTOMER
+		JOIN
+		BUSINESS_INFO
+		USING(C_NO)
+		WHERE
+		C_NO = #{cNo}
+	</select>
+
+	<!-- 일반 회원 상세정보 출력 -->
+	<select id="selectNormalCustomer" resultMap="CustomerResultSet">
+		SELECT C_NO, C_NAME,
+		C_ID,
+		C_STATUS, C_EMAIL, C_ENROLLDATE, C_ADDRESS,C_LEVEL
+		FROM CUSTOMER
+		WHERE
+		C_NO = #{cNo}
+
+	</select>
+
+	<!-- 사업자로 등급 변경 -->
+	<update id="updateBusinessGrade" parameterType="_int">
+		UPDATE CUSTOMER
+		SET
+		C_LEVEL = '사업자'
+		WHERE C_NO = #{cNo}
+	</update>
+	
+		<update id="updateBusinessGrade2" parameterType="_int">
+		UPDATE BUSINESS_INFO
+		SET
+		B_PERMIT = 'Y'
+		WHERE C_NO = #{cNo}
+	</update>
+
+
+	<!-- 일반 사용자 변경 -->
+	<update id="updateNormalUser" parameterType="CustomerAdmin">
+		UPDATE CUSTOMER
+		SET
+		C_STATUS = #{cStatus}
+		WHERE C_NO = #{cNo}
+	</update>
+
+	<!-- 사업자 블랙 취소 -->
+	<update id="updateBusinessReport" parameterType="CustomerAdmin">
+		UPDATE CUSTOMER
+		SET
+		C_STATUS = 'Y'
+		WHERE C_NO = #{cNo}
+	</update>
+
+	<!-- 일반 유저 출력 -->
+	<select id="NormalUserInfoList" resultMap="CustomerResultSet">
+		SELECT *
+		FROM CUSTOMER
+		WHERE C_LEVEL = '일반'
+        OR C_LEVEL ='미승인사업자'
+        OR C_LEVEL = '신고된사업자'
+        AND C_STATUS='Y'
+	</select>
+
+
+	<!--  구매내역 조회  -->
+	<select id="NormalUserBuyList" resultMap="DealResultSet">
+		SELECT C_NAME, P_NAME,  B_SHOP_NAME, D_AMOUNT * D_PRICE hap,  D_DATE, D_REV_CHECK
+		FROM DEAL
+		JOIN CUSTOMER CU USING(C_NO)
+		JOIN PRODUCT PR USING(P_NO)
+		JOIN BUSINESS_INFO BI ON(PR.C_NO = BI.C_NO)
+	</select>
+	
+	
+	<!-- 등급 리스트 취소 -->
+		<update id="updateGradeCancel" parameterType="_int">
+		UPDATE CUSTOMER
+		SET
+		C_LEVEL = '미승인사업자'
+		WHERE C_NO = #{cNo}
+
+	</update>
+
+
+</mapper>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+"-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="userMapper">
+	<resultMap id="customerResultSet" type="Customer">
+		<id property="cNo" column="C_NO"/>
+		<result property="cName" column="C_NAME"/>
+		<result property="cId" column="C_ID"/>
+		<result property="cPwd" column="C_PWD"/>
+		<result property="cEmail" column="C_EMAIL"/>
+		<result property="cAddress" column="C_ADDRESS"/>
+		<result property="cStatus" column="C_STATUS"/>
+		<result property="cPhone" column="C_PHONE"/>
+		<result property="cEnrollDate" column="C_ENROLLDATE"/>
+		<result property="cLevel" column="C_LEVEL"/>
+	</resultMap>
+	
+	<insert id="insertCustomer" parameterType="Customer">
+		INSERT INTO CUSTOMER VALUES (SEQ_CNO.NEXTVAL, #{cName}, #{cId}, #{cPwd}, #{cEmail}, #{cAddress}, DEFAULT, #{cPhone}, SYSDATE, DEFAULT)
+	</insert>
+	
+	<select id="login" parameterType="Customer" resultMap="customerResultSet">
+		SELECT *
+		FROM CUSTOMER
+		WHERE C_ID=#{cId}
+		AND C_STATUS='Y'
+	</select>
+	
+	<select id="checkId" parameterType="string" resultType="_int">
+		SELECT COUNT(*) 
+		FROM CUSTOMER 
+		WHERE C_ID=#{cId}
+	</select>
+	
+	<select id="checkEmail" parameterType="string" resultType="_int">
+		SELECT COUNT(*) 
+		FROM CUSTOMER 
+		WHERE C_EMAIL=#{cEmail}
+	</select>
+	
+	<update id="updateCustomer" parameterType="Customer">
+		UPDATE CUSTOMER
+		SET C_EMAIL=#{cEmail}, C_ADDRESS=#{cAddress}, C_PHONE=#{cPhone}
+		WHERE C_ID=#{cId}
+	</update>
+	
+	<update id="deleteCustomer" parameterType="Customer">
+		UPDATE CUSTOMER
+		SET C_STATUS='N'
+		WHERE C_ID=#{cId}
+	</update>
+	
+   <!-- 비밀번호 변경 -->
+   <update id="updatePwd" parameterType="Customer">
+      UPDATE CUSTOMER 
+      SET C_PWD=#{cPwd}
+      WHERE C_NO=#{cNo}
+   </update>
+	
+	<select id="checkPwd" parameterType="string" resultType="_int">
+		SELECT COUNT(*) 
+		FROM CUSTOMER 
+		WHERE C_PWD=#{encodePwd}
+	</select>
+	
+	
+	<!-- BusinessInfo -->
+	
+	<resultMap id="BusinessInfoResultSet" type="BusinessInfo">
+		<id property="bShopNo" column="B_SHOP_NO"/>
+		<result property="bPermit" column="B_PERMIT"/>
+		<result property="bShopName" column="B_SHOP_NAME"/>
+		<result property="bClass" column="B_CLASS"/>
+		<result property="bDetailClass" column="B_DETAIL_CLASS"/>
+		<result property="bOwner" column="B_OWNER"/>
+		<result property="bPic" column="B_PIC"/>
+		<result property="bShopAddress" column="B_SHOP_ADDRESS"/>
+		<result property="cNo" column="C_NO"/>
+	</resultMap>
+	
+	<insert id="insertBusinessInfo" parameterType="BusinessInfo">
+		INSERT INTO BUSINESS_INFO
+		VALUES (#{bShopNo}, DEFAULT, #{bShopName}, #{bClass}, #{bDetailClass}, 
+				#{bOwner}, #{bPic}, #{bShopAddress}, SEQ_CNO.CURRVAL)
+	</insert>
+	
+	<select id="checkShopNo" parameterType="string" resultType="_int">
+		SELECT COUNT(*) 
+		FROM BUSINESS_INFO 
+		WHERE B_SHOP_NO=#{bShopNo}
+	</select>
+	
+	
+	<!-- Deal -->
+	<resultMap id="DealListSet" type="Deal">
+		<id property="dNo" column="D_NO"/>
+		<result property="dDate" column="D_DATE"/>
+		<result property="pNo" column="P_NO"/>
+		<result property="cNo" column="C_NO"/>
+		<result property="dPrice" column="D_PRICE"/>
+		<result property="dAmount" column="D_AMOUNT"/>
+		<result property="dMethod" column="D_METHOD"/>
+		<result property="dReceiver" column="D_RECEIVER"/>
+		<result property="dRevDate" column="D_REV_DATE"/>
+		<result property="dRevCheck" column="D_REV_CHECK"/>
+		<result property="dStatus" column="D_STATUS"/>
+		<result property="pName" column="P_NAME"/>
+		<result property="cName" column="C_NAME"/>
+	</resultMap>
+	
+	<!-- 범석 -->
+	<resultMap id="DealSet" type="Deal">
+      <id property="dNo" column="D_NO"/>
+      <result property="dDate" column="D_DATE"/>
+      <result property="pNo" column="P_NO"/>
+      <result property="pName" column="P_NAME"/>
+      <result property="cNo" column="C_NO"/>
+      <result property="cName" column="C_NAME"/>
+      <result property="dPrice" column="D_PRICE"/>
+      <result property="dAmount" column="D_AMOUNT"/>
+      <result property="dMethod" column="D_METHOD"/>
+      <result property="dReceiver" column="D_RECEIVER"/>
+      <result property="dRevCheck" column="D_REVCHECK"/>
+      <result property="dStatus" column="D_STATUS"/>
+      <result property="dUid" column="D_UID"/>
+      <result property="pBoard" column="P_BOARD"/>
+   </resultMap>
+	<!-- 범석 -->
+	
+	<select id="selectDealList" parameterType="_int" resultMap="DealListSet">
+		SELECT D_NO, D_DATE, D_PRICE, D_AMOUNT, D_METHOD, D_RECEIVER, D_REV_DATE, D_REV_CHECK, D_STATUS, P_NAME, C_NAME
+		FROM DEAL 
+		JOIN PRODUCT USING(P_NO)
+		JOIN CUSTOMER ON(DEAL.C_NO = CUSTOMER.C_NO)
+		WHERE P_NO IN(
+		SELECT PRODUCT.P_NO
+		FROM CUSTOMER JOIN PRODUCT ON(CUSTOMER.C_NO = PRODUCT.C_NO)
+		WHERE CUSTOMER.C_NO = #{cNo})
+	</select>
+	
+	<update id="updateRcv" parameterType="Deal">
+		UPDATE DEAL
+		SET D_REV_CHECK=#{dRevCheck}
+		WHERE D_NO=#{dNo}
+	</update>
+	
+	<select id="countDeal" parameterType="_int" resultType="_int">
+		SELECT COUNT(*)
+		FROM DEAL
+		WHERE C_NO=#{cNo}
+	</select>
+	
+	<!-- 범석 02.05. selectList2 수정-->
+	<select id="selectDealList2" parameterType="_int" resultMap="DealSet">
+      SELECT D.D_NO, D.D_DATE, D.P_NO, D.C_NO, D.D_PRICE, D_AMOUNT, D_METHOD, D_RECEIVER, D_REV_DATE, D_REV_CHECK, D_STATUS, D_UID, PRODUCT.P_NAME, CUSTOMER.C_NAME, PRODUCT.P_BOARD
+      FROM DEAL D
+      JOIN PRODUCT ON(D.P_NO = PRODUCT.P_NO)
+      JOIN CUSTOMER ON(CUSTOMER.C_NO = D.C_NO)
+      WHERE CUSTOMER.C_NO = #{cNo}
+   </select>
+ 
+   <select id="countBusiness" parameterType="_int" resultType="_int">
+		SELECT COUNT(*) FROM DEAL 
+		WHERE P_NO IN(
+		SELECT PRODUCT.P_NO
+		FROM CUSTOMER JOIN PRODUCT ON(CUSTOMER.C_NO = PRODUCT.C_NO)
+		WHERE CUSTOMER.C_NO = #{cNo})
+   </select>
+	
+</mapper>

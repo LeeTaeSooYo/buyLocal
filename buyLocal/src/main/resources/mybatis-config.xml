@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC 
+"-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="jdbcTypeForNull" value="NULL"/>
+	</settings>
+	
+	<typeAliases>
+		<typeAlias type="com.mylocal.myL.shop.hotDeal.model.vo.Product" alias="product"/>
+		<typeAlias type="com.mylocal.myL.common.Cart" alias="Cart"/>
+      <typeAlias type="com.mylocal.myL.common.Deal" alias="Deal"/>
+      <typeAlias type="com.mylocal.myL.common.Favorite" alias="Favorite"/>
+		<typeAlias type="com.mylocal.myL.shop.hotDeal.model.vo.Review" alias="review"/>
+	
+		<typeAlias type="com.mylocal.myL.admin.model.vo.Product" alias="ProductAdmin"/>
+		<typeAlias type="com.mylocal.myL.admin.model.vo.Customer" alias="CustomerAdmin"/>
+		<typeAlias type="com.mylocal.myL.admin.model.vo.QnA" alias="Qna"/>
+		<typeAlias type="com.mylocal.myL.admin.model.vo.ShareBoard" alias="ShareBoardAdmin"/>
+		<!--  규내  -->
+		<typeAlias type="com.mylocal.myL.admin.model.vo.Notice" alias="Notice"/>
+		<typeAlias type="com.mylocal.myL.admin.model.vo.Report" alias="Report"/>
+		<typeAlias type="com.mylocal.myL.shop.ttang.model.vo.Product" alias="productT"/>
+		<typeAlias type="com.mylocal.myL.application.model.vo.Product" alias="productA"/>
+		<typeAlias type="com.mylocal.myL.serviceCenter.model.vo.QNA" alias="Q"/>
+	   
+	   <!--형우 (시작)  -->
+	    <typeAlias type="com.mylocal.myL.share.model.vo.ShareBoard" alias="ShareBoard"/>
+		<typeAlias type="com.mylocal.myL.share.model.vo.Reply" alias="Reply"/>
+		<typeAlias type="com.mylocal.myL.share.model.vo.Category" alias="Category"/>
+		<typeAlias type="com.mylocal.myL.share.model.vo.Local" alias="Local"/>
+		<!-- 형우(끝)  -->
+		<!-- 1.22.  -->
+		<typeAlias type="com.mylocal.myL.admin.model.vo.ShareBoard" alias="adShareBoard"/>
+		<typeAlias type="com.mylocal.myL.admin.model.vo.Deal" alias="adDeal"/>
+		
+		
+		<!-- 01.30 추가된 타입 -->
+		<typeAlias type="com.mylocal.myL.common.SearchList" alias="SearchList"/>
+		<!-- 끝 -->
+		<typeAlias type="com.mylocal.myL.user.model.vo.BusinessInfo" alias="BusinessInfo"/>
+		<typeAlias type="com.mylocal.myL.user.model.vo.Customer" alias="Customer"/>
+	</typeAliases>
+	
+	<mappers>
+		<mapper resource="mappers/hotDeal-mapper.xml"/>
+		<mapper resource="mappers/admin/admin-mapper.xml"/>
+		<mapper resource="mappers/admin/adContent-mapper.xml"/>
+		<mapper resource="mappers/admin/adUser-mapper.xml"/>
+		<mapper resource="mappers/ttang-mapper.xml"/>
+		<mapper resource="mappers/product-mapper.xml"/> 
+		<mapper resource="mappers/qna-mapper.xml"/>
+		<mapper resource="mappers/notice-mapper.xml"/>
+   		<mapper resource="mappers/share-mapper.xml"/>
+		<mapper resource="mappers/reply-mapper.xml"/>
+		<mapper resource="mappers/user/user-mapper.xml"/>
+	</mappers>
+</configuration>

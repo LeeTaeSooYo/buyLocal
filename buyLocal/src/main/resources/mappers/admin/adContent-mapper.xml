@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+"-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="adContentMapper">
+
+	
+
+	<!-- 물건관련 -->
+	<resultMap id="ProductResultSet" type="ProductAdmin">
+		<id property="pNo" column="P_NO" />
+		<result property="pName" column="P_NAME" />
+		<result property="pTitle" column="P_TITLE" />
+		<result property="pDate" column="P_DATE" />
+		<result property="cNo" column="C_NO" />
+		<result property="cName" column="C_NAME" />
+
+
+	</resultMap>
+
+	<!-- 판매자 내역 일부분 -->
+	<resultMap id="CustomerResultSet" type="CustomerAdmin">
+		<id property="cNo" column="C_NO" />
+		<result property="cName" column="C_NAME" />
+		<result property="cId" column="C_ID" />
+		<result property="cPwd" column="C_PWD" />
+		<result property="cEmail" column="C_EMAIL" />
+		<result property="cAddress" column="C_ADDRESS" />
+		<result property="sStatus" column="C_STATUS" />
+		<result property="cPhone" column="C_PHONE" />
+		<result property="cEnrollDate" column="C_ENROLLDATE" />
+
+	</resultMap>
+
+	<!-- QNA 내역 일부분 -->
+	<resultMap id="QnaResultSet" type="Qna">
+		<id property="qNo" column="Q_NO" />
+		<result property="qTitle" column="Q_TITLE" />
+		<result property="qContent" column="Q_CONTENT" />
+		<result property="qEnrollDate" column="Q_ENROLLDATE" />
+		<result property="qStatus" column="Q_STATUS" />
+		<result property="cEmail" column="C_EMAIL" />
+		<result property="cName" column="C_NAME" />
+		<result property="cNo" column="C_NO" />
+		<result property="cId" column="C_ID" />
+		<result property="qReplyDate" column="Q_REPLYDATE" />
+
+	</resultMap>
+
+	<!-- 신고관련 -->
+	<resultMap id="ReportResultSet" type="Report">
+		<id property="rtNo" column="RT_NO" />
+		<result property="rtTitle" column="RT_TITLE" />
+		<result property="rtContent" column="RT_CONTENT" />
+		<result property="rtDate" column="RT_DATE" />
+		<result property="cNo" column="C_NO" />
+		<result property="cName" column="reporter" />
+		<result property="rtCategory" column="RT_CATEGORY" />
+		<result property="rtStatus" column="RT_STATUS" />
+		<result property="rtDivide" column="RT_DIVIDE" />
+		<result property="rtNum" column="RT_NUM" />
+		<result property="pBoard" column="P_BOARD" />
+		<result property="cName2" column="reported" />
+		<result property="cStatus" column="hello" />
+	</resultMap>
+
+	<!-- 게시판 관련 -->
+	<resultMap id="ShareBoardResultSet" type="adShareBoard">
+		<id property="sbNo" column="SB_NO" />
+		<result property="sbTitle" column="SB_TITLE" />
+		<result property="sbContent" column="SB_CONTENT" />
+		<result property="sbCreateDate" column="SB_CREATEDATE" />
+		<result property="sbStatus" column="SB_STATUS" />
+		<result property="cNo" column="C_NO" />
+		<result property="cName" column="C_NAME" />
+		<result property="sbView" column="SB_VIEW" />
+		<result property="sbcgName" column="SB_CG_NAME" />
+		<result property="rtDivide" column="RT_DIVIDE" />
+
+
+	</resultMap>
+
+
+	<!-- 공지사항 관련 -->
+	<resultMap id="NoticeResultSet" type="Notice">
+		<id property="nNo" column="N_NO" />
+		<result property="nTitle" column="N_TITLE" />
+		<result property="nContent" column="N_CONTENT" />
+		<result property="nDate" column="N_DATE" />
+		<result property="nStatus" column="N_STATUS" />
+		<result property="nView" column="N_VIEW" />
+	</resultMap>
+
+
+	<!-- 통계 관련 -->
+	<resultMap id="DealSet" type="Deal">
+		<id property="dNo" column="D_NO" />
+		<result property="dDate" column="D_DATE" />
+		<result property="pNo" column="P_NO" />
+		<result property="pName" column="P_NAME" />
+		<result property="cNo" column="C_NO" />
+		<result property="cName" column="C_NAME" />
+		<result property="dPrice" column="D_PRICE" />
+		<result property="dAmount" column="D_AMOUNT" />
+		<result property="dMethod" column="D_METHOD" />
+		<result property="dReceiver" column="D_RECEIVER" />
+		<result property="dRevCheck" column="D_REVCHECK" />
+		<result property="dStatus" column="D_STATUS" />
+		<result property="dUid" column="D_UID" />
+	</resultMap>
+
+	<!-- Q & A 갯수 확인 -->
+	<select id="getQnaListCount" resultType="_int">
+		SELECT COUNT(*)
+		FROM QNA
+		WHERE Q_STATUS='Y'
+	</select>
+
+	<!-- 신고된 갯수 확인 -->
+	<select id="getReportListCount" resultType="_int">
+		SELECT COUNT(*)
+		FROM
+		REPORT
+		WHERE RT_STATUS='Y'
+	</select>
+
+
+
+	<insert id="insertReport" parameterType="Report">
+		INSERT INTO REPORT
+		VALUES(
+		SEQ_REPORT.NEXTVAL, #{rtTitle}, #{ rtContent }, SYSDATE,
+		#{cNo}, #{rtCategory}, DEFAULT, '1', #{rtNum})
+
+	</insert>
+
+	<insert id="insertReport1" parameterType="Report">
+		INSERT INTO REPORT
+		VALUES(
+		SEQ_REPORT.NEXTVAL, #{rtTitle}, #{ rtContent }, SYSDATE,
+		#{cNo}, #{rtCategory}, DEFAULT, '2', #{rtNum})
+	</insert>
+
+
+	<!-- QNA리스트 -->
+	<select id="QnASelectList" resultMap="QnaResultSet">
+		SELECT *
+		FROM QNA
+		JOIN
+		CUSTOMER USING(C_NO)
+		WHERE Q_STATUS='Y'
+	</select>
+
+
+	<!-- QNA리스트 -->
+	<select id="QnASelectList2" resultMap="QnaResultSet">
+		SELECT *
+		FROM QNA
+		JOIN
+		CUSTOMER USING(C_NO)
+		WHERE Q_STATUS='N'
+	</select>
+
+	<!-- 신고 목록 리스트 -->
+	<select id="ReportSelectList" resultMap="ReportResultSet">
+		SELECT REPORT.C_NO,
+		RT_NO, RT_TITLE, RT_CONTENT, RT_DATE, RT_CATEGORY,
+		RT_STATUS,
+		RT_DIVIDE, RT_NUM, C.C_NAME reporter, C.C_ID, P_BOARD, C.C_STATUS,
+		B.C_NAME reported, B.C_STATUS hello
+		FROM REPORT
+		JOIN CUSTOMER C
+		ON(C.C_NO = REPORT.C_NO)
+		JOIN PRODUCT A ON(RT_NUM = P_NO)
+		JOIN CUSTOMER
+		B ON(A.C_NO = B.C_NO)
+		WHERE
+		RT_STATUS = 'Y' AND
+		A.C_NO = B.C_NO AND
+		B.C_STATUS = 'Y'
+	</select>
+
+
+
+	<!-- 신고 목록 리스트 -->
+	<select id="ReportSelectList2" resultMap="ReportResultSet">
+		SELECT REPORT.C_NO,
+		RT_NO, RT_TITLE, RT_CONTENT, RT_DATE, RT_CATEGORY,
+		RT_STATUS,
+		RT_DIVIDE, RT_NUM, C.C_NAME reporter, C.C_ID, P_BOARD,
+		C.C_STATUS,
+		B.C_NAME reported, B.C_STATUS hello
+		FROM REPORT
+		JOIN
+		CUSTOMER C
+		ON(C.C_NO
+		= REPORT.C_NO)
+		JOIN PRODUCT A ON(RT_NUM = P_NO)
+		JOIN CUSTOMER B
+		ON(A.C_NO = B.C_NO)
+		WHERE
+		RT_STATUS = 'N' AND
+		A.C_NO =B.C_NO AND
+		B.C_STATUS = 'N'
+	</select>
+
+
+	<!-- 땡처리 목록 -->
+	<select id="TtangSelectList" resultMap="ProductResultSet">
+		SELECT P.P_TITLE,
+		P.P_NAME, C.C_NAME, P.P_DATE , P.P_NO
+		FROM PRODUCT P
+		JOIN CUSTOMER C
+		ON(P.C_NO = C.C_NO)
+		WHERE P.P_BOARD ='땡처리'
+		AND P.P_STATUS = 'Y'
+	</select>
+
+	<!-- 핫딜 목록 -->
+	<select id="HotDealSelectList" resultMap="ProductResultSet">
+		SELECT P.P_TITLE,
+		P.P_NAME, C.C_NAME, P.P_DATE, P.P_NO
+		FROM PRODUCT P
+		JOIN CUSTOMER C
+		ON(P.C_NO = C.C_NO)
+		WHERE P.P_BOARD ='핫딜'
+		AND P.P_STATUS = 'Y'
+	</select>
+
+	<!-- 게시판 목록 -->
+	<select id="ShareBoardSelectList"
+		resultMap="ShareBoardResultSet">
+		SELECT *
+		FROM SHAREBOARD
+		JOIN CUSTOMER USING(C_NO)
+		JOIN
+		SB_CATEGORY USING(SB_CG_CODE)
+		WHERE SB_STATUS = 'Y'
+	</select>
+
+	<!-- 공지사항 리스트 -->
+	<select id="NoticeSelectList" resultMap="NoticeResultSet">
+		SELECT *
+		FROM NOTICE
+	</select>
+
+	<!-- Qna 상세보기 -->
+	<select id="selectQna" resultMap="QnaResultSet">
+		SELECT *
+		FROM QNA
+		JOIN CUSTOMER USING(C_NO)
+		WHERE
+		Q_STATUS='Y'
+		AND Q_NO = #{qNo}
+	</select>
+
+	<!-- 신고하기 상세보기 -->
+	<select id="selectReport" resultMap="ReportResultSet">
+		SELECT REPORT.C_NO, RT_NO,
+		RT_TITLE, RT_CONTENT, RT_DATE, RT_CATEGORY,
+		RT_STATUS, RT_DIVIDE,
+		RT_NUM, C_NAME, C_ID, P_BOARD
+		FROM REPORT
+		JOIN CUSTOMER ON(CUSTOMER.C_NO
+		= REPORT.C_NO)
+		JOIN PRODUCT ON(RT_NUM = P_NO)
+		WHERE
+		RT_NO = #{rtNo}
+	</select>
+
+	<!-- 상품 가져오기 02.06. -->
+	<select id="selectProduct" resultMap="ProductResultSet">
+		SELECT *
+      FROM PRODUCT
+      JOIN
+      CUSTOMER USING(C_NO)
+      AND P_NO = #{rtNum}
+	</select>
+
+	<update id="updateQna" parameterType="_int">
+		UPDATE QNA
+		SET
+		Q_STATUS =
+		'N',
+		Q_REPLYDATE = SYSDATE
+		WHERE Q_NO = #{qNo}
+
+	</update>
+
+	<!-- 신고 취소 -->
+	<update id="updateReportCancel" parameterType="_int">
+		UPDATE REPORT
+		SET
+		RT_STATUS = 'N'
+		WHERE RT_NO = #{rtNo}
+
+	</update>
+
+	<!-- 회원 정보 변경 정지처리 -->
+	<update id="updateCustomer" parameterType="_int">
+		UPDATE CUSTOMER
+		SET
+		C_STATUS = 'N',
+		C_LEVEL = '신고된사업자'
+		WHERE C_NO = #{getcNo}
+	</update>
+	
+	
+		<!-- 회원 정보 변경 시켰으니 사업자 명도 바꿔주기 정지처리 -->
+	<update id="updateBusinessInfo" parameterType="_int">
+		UPDATE BUSINESS_INFO
+		SET
+		B_PERMIT = 'N'
+		WHERE C_NO = #{getcNo}
+	</update>
+	
+	
+	
+	
+
+
+	<!-- 회원 정보 변경 정지 취소 처리 -->
+	<update id="updateCustomer2" parameterType="_int">
+		UPDATE CUSTOMER
+		SET
+		C_STATUS = 'Y',
+		C_LEVEL = '일반'
+		WHERE C_NO = #{getcNo}
+	</update>
+	
+	<!-- 하루 거래량 불러오기용 -->
+	<select id="selectDeal" resultMap="DealSet">
+		SELECT D.D_NO, D.D_DATE,
+		D.P_NO, D.C_NO, D.D_PRICE, D_AMOUNT, D_METHOD, D_RECEIVER, D_REV_DATE,
+		D_REV_CHECK, D_STATUS, D_UID, PRODUCT.P_NAME, CUSTOMER.C_NAME
+		FROM DEAL
+		D
+		JOIN PRODUCT ON(D.P_NO = PRODUCT.P_NO)
+		JOIN CUSTOMER ON(CUSTOMER.C_NO
+		= D.C_NO)
+	</select>
+
+	<!-- 통계 불러오기용 -->
+	<select id="selectDeal2" resultType="_int"
+		parameterType="string">
+		SELECT COUNT(*)
+		FROM DEAL D
+		JOIN PRODUCT ON(D.P_NO = PRODUCT.P_NO)
+		JOIN
+		CUSTOMER ON(CUSTOMER.C_NO = D.C_NO)
+		<choose>
+			<when test="str == 'C1'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 01
+			</when>
+			<when test="str == 'C2'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 02
+			</when>
+			<when test="str == 'C3'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 03
+			</when>
+			<when test="str == 'C4'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 04
+			</when>
+			<when test="str == 'C5'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 05
+			</when>
+			<when test="str == 'C6'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 06
+			</when>
+			<when test="str == 'C7'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 07
+			</when>
+			<when test="str == 'C8'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 08
+			</when>
+			<when test="str == 'C9'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 09
+			</when>
+			<when test="str == 'C10'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 10
+			</when>
+			<when test="str == 'C11'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 11
+			</when>
+			<when test="str == 'C12'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 12
+			</when>
+			<when test="str == 'C13'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 13
+			</when>
+			<when test="str == 'C14'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 14
+			</when>
+			<when test="str == 'C15'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 15
+			</when>
+			<when test="str == 'C16'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 16
+			</when>
+			<when test="str == 'C17'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 17
+			</when>
+			<when test="str == 'C18'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 18
+			</when>
+			<when test="str == 'C19'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 19
+			</when>
+			<when test="str == 'C20'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 20
+			</when>
+			<when test="str == 'C21'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 21
+			</when>
+			<when test="str == 'C22'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 22
+			</when>
+			<when test="str == 'C23'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 23
+			</when>
+			<when test="str == 'C24'">
+				where to_char( D_DATE, 'yyyymmdd' ) = to_char(
+				sysdate, 'yyyymmdd')
+				AND to_char(D_DATE, 'HH24') = 24
+			</when>
+		</choose>
+
+	</select>
+	
+	<update id="updateProduct" parameterType="_int">
+		UPDATE PRODUCT
+		SET P_STATUS = 'N'
+		WHERE C_NO = #{getcNo}
+	</update>
+
+
+</mapper>

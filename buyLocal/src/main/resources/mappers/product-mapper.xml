@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+"-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.rog/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="productMapper">
+
+	<resultMap id="productSet" type="productA">
+		<id property="pNo" column="P_NO"/>
+		<result property="pName" column="P_NAME"/>
+		<result property="pThumb" column="P_THUMB"/>
+		<result property="pOriginalPrice" column="P_ORIGINALPRICE"/>
+		<result property="pFinalPrice" column="P_FINALPRICE"/>
+		<result property="pAmount" column="P_AMOUNT"/>
+		<result property="pInfoImage" column="P_INFO_IMAGE"/>
+		<result property="pInfoText" column="P_INFO_TEXT"/>
+		<result property="cgCode" column="CG_CODE"/>
+		<result property="pDate" column="P_DATE"/>
+		<result property="pStatus" column="P_STATUS"/>
+		<result property="lCode" column="L_CODE"/>
+		<result property="pStarRate" column="P_STARRATE"/>
+		<result property="pOrigin" column="P_ORIGIN"/>
+		<result property="pTitle" column="P_TITLE"/>
+		<result property="pBoard" column="P_BOARD"/>
+		<result property="cNo" column="C_NO"/>
+		<result property="pVolume" column="P_VOLUME"/>
+		<result property="pProductDate" column="P_PRODUCT_DATE"/>
+		<result property="pTreatment" column="P_TREATMENT"/>
+		<result property="pStartDate" column="P_START_DATE"/>
+		<result property="pEndDate" column="P_END_DATE"/>
+	</resultMap> 
+		
+	<insert id="insertProduct" parameterType="productA">
+		INSERT INTO PRODUCT VALUES
+		 (SEQ_PNO.NEXTVAL, #{pName}, #{pThumb},
+				#{pOriginalPrice}, #{pFinalPrice}, #{pAmount}, #{pInfoImage},
+				#{pInfoText}, #{cgCode}, SYSDATE, DEFAULT, #{lCode}, DEFAULT,
+				#{pOrigin}, #{pTitle}, #{pBoard}, #{cNo}, #{pVolume}, #{pProductDate},
+				#{pTreatment}, #{pStartDate}, #{pEndDate}) 
+	</insert> 
+	
+	
+	
+</mapper>
